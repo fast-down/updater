@@ -1,7 +1,8 @@
 # fast-down-updater
 
+[![cloudflare workers](https://badgen.net/badge/a/Cloudflare%20Workers/orange?icon=https%3A%2F%2Fworkers.cloudflare.com%2Fresources%2Flogo%2Flogo.svg&label=)](https://workers.cloudflare.com/)
 ![Latest commit (branch)](https://img.shields.io/github/last-commit/fast-down/updater/main)
-![License](https://camo.githubusercontent.com/2c688e7decdaf0ee046dbefbf1bfeff0500b962e151b1a606d791f8f2e9f54c6/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d627269676874677265656e2e737667)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/fast-down/updater/blob/main/LICENSE)
 
 这是一个用来更新 fast-down 的 Cloudflare Worker
 
