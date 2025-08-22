@@ -29,22 +29,28 @@
 
 `https://fast-down-update.s121.top/{项目名称}/latest`
 
-- `{项目名称}`
+- {项目名称}
   - `cli`
+  - `gui`
 
 ### 下载最新版本
 
-[https://fast-down-update.s121.top/cli/download/linux/64bit](https://fast-down-update.s121.top/cli/download/linux/64bit)
+[https://fast-down-update.s121.top/cli/download/latest/linux/64bit](https://fast-down-update.s121.top/cli/download/latest/linux/64bit)
 
-`https://fast-down-update.s121.top/{项目名称}/download/{系统}/{架构}`
+`https://fast-down-update.s121.top/{项目名称}/download/{版本}/{系统}/{架构}`
 
-- `{项目名称}`
+- {项目名称}
   - `cli`
-- `{系统}`
+  - `gui`
+- {版本}
+  - `latest`
+  - `2.2.1` (注意不带 `v`)
+  - ...
+- {系统}
   - `linux`
   - `macos`
   - `windows`
-- `{架构}`
+- {架构}
   - `32bit`
   - `64bit`
   - `arm64`
