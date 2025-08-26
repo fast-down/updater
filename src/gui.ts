@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import * as cheerio from "cheerio";
 
 const urlCache = new Map<string, string>();
 const latestJsonUrl =
@@ -13,6 +14,14 @@ export const guiApp = new Hono()
         "https://fast-down-update.s121.top/gui/raw/download/"
       );
     }
+    const infoResp = await fetch(
+      `https://github.com/fast-down/gui/releases/tag/fast-down-v${res.version}`
+    );
+    const html = await infoResp.text();
+    const $ = cheerio.load(html, {
+      baseURI: infoResp.url,
+    });
+    res.notes = $(".markdown-body").html() || "修复了一些已知问题";
     return c.json(res);
   })
   .get("/raw/download/:tag/:filename", async (c) => {
