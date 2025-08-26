@@ -21,6 +21,7 @@ export const guiApp = new Hono()
     const $ = cheerio.load(html, {
       baseURI: infoResp.url,
     });
+    $(".markdown-body a").prop("target", "_blank");
     res.notes = $(".markdown-body").html() || "修复了一些已知问题";
     return c.json(res);
   })
