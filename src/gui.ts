@@ -33,7 +33,7 @@ export const guiApp = new Hono()
       const res = await fetch(url, { method: "HEAD" });
       urlCache.set(url, res.url);
     }
-    return fetch(new Request(urlCache.get(url)!, c.req.raw));
+    return fetch(urlCache.get(url)!, c.req.raw);
   })
   .get("/download/:version/:platform/:arch", async (c) => {
     const version = c.req.param("version");

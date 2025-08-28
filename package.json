@@ -8,11 +8,11 @@
   },
   "dependencies": {
     "cheerio": "^1.1.2",
-    "hono": "^4.9.0"
+    "hono": "^4.9.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250809.0",
-    "@types/node": "^24.2.1",
-    "wrangler": "^4.4.0"
+    "@cloudflare/workers-types": "^4.20250828.0",
+    "@types/node": "^24.3.0",
+    "wrangler": "^4.33.1"
   }
 }
