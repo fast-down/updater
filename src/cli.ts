@@ -7,7 +7,7 @@ export const cliApp = new Hono()
   .get("/latest", async (c) => {
     const version = await getLatestVersion();
     const infoResp = await fetch(
-      `https://github.com/fast-down/cli/releases/expanded_assets/${version}`
+      `https://github.com/fast-down/cli/releases/expanded_assets/v${version}`
     );
     const html = await infoResp.text();
     const $ = cheerio.load(html, {
@@ -50,7 +50,7 @@ export const cliApp = new Hono()
     const platform = c.req.param("platform");
     const arch = c.req.param("arch");
     const { tag, filename } = await genReleaseUrl(version, platform, arch);
-    return c.redirect(`/cli/raw/download/${tag}/${filename}`);
+    return c.redirect(`/cli/raw/download/v${tag}/${filename}`);
   });
 
 /**
@@ -62,12 +62,12 @@ export const cliApp = new Hono()
 async function genReleaseUrl(version: string, platform: string, arch: string) {
   if (version === "latest")
     version = await getLatestVersion();
-  return { tag: `v${version}`, filename: `fast-down-${platform}-${arch}.zip` };
+  return { tag: version, filename: `fast-down-${platform}-${arch}.zip` };
 }
 
 async function getLatestVersion() {
   const releasesResp = await fetch(
     "https://github.com/fast-down/cli/releases/latest/"
   );
-  return releasesResp.url.split("/").at(-1)!;
+  return releasesResp.url.split("/").at(-1)!.split("v")[1];
 }
