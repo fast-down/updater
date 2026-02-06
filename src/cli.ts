@@ -1,8 +1,6 @@
 import { Hono } from "hono";
 import * as cheerio from "cheerio";
 
-const urlCache = new Map<string, string>();
-
 export const cliApp = new Hono()
   .get("/latest", async (c) => {
     const version = await getLatestVersion();
@@ -35,22 +33,13 @@ export const cliApp = new Hono()
       assets,
     });
   })
-  .get("/raw/download/:tag/:filename", async (c) => {
-    const tag = c.req.param("tag");
-    const filename = c.req.param("filename");
-    const url = `https://github.com/fast-down/cli/releases/download/${tag}/${filename}`;
-    if (!urlCache.has(url)) {
-      const res = await fetch(url, { method: "HEAD" });
-      urlCache.set(url, res.url);
-    }
-    return fetch(urlCache.get(url)!, c.req.raw);
-  })
   .get("/download/:version/:platform/:arch", async (c) => {
     const version = c.req.param("version");
     const platform = c.req.param("platform");
     const arch = c.req.param("arch");
     const { tag, filename } = await genReleaseUrl(version, platform, arch);
-    return c.redirect(`/cli/raw/download/v${tag}/${filename}`);
+    const url = `https://github.com/fast-down/cli/releases/download/v${tag}/${filename}`;
+    return c.redirect(url);
   });
 
 /**

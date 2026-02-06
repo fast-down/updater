@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import * as cheerio from "cheerio";
 
-const urlCache = new Map<string, string>();
 const latestJsonUrl =
   "https://github.com/fast-down/gui/releases/latest/download/latest.json";
 
@@ -11,11 +10,11 @@ export const guiApp = new Hono()
     for (const i in res.platforms) {
       res.platforms[i].url = res.platforms[i].url.replace(
         "https://github.com/fast-down/gui/releases/download/",
-        "https://fast-down-update.s121.top/gui/raw/download/"
+        "https://fast-down-update.s121.top/gui/raw/download/",
       );
     }
     const infoResp = await fetch(
-      `https://github.com/fast-down/gui/releases/tag/fast-down-v${res.version}`
+      `https://github.com/fast-down/gui/releases/tag/fast-down-v${res.version}`,
     );
     const html = await infoResp.text();
     const $ = cheerio.load(html, {
@@ -25,22 +24,13 @@ export const guiApp = new Hono()
     res.notes = $(".markdown-body").html() || "修复了一些已知问题";
     return c.json(res);
   })
-  .get("/raw/download/:tag/:filename", async (c) => {
-    const tag = c.req.param("tag");
-    const filename = c.req.param("filename");
-    const url = `https://github.com/fast-down/gui/releases/download/${tag}/${filename}`;
-    if (!urlCache.has(url)) {
-      const res = await fetch(url, { method: "HEAD" });
-      urlCache.set(url, res.url);
-    }
-    return fetch(urlCache.get(url)!, c.req.raw);
-  })
   .get("/download/:version/:platform/:arch", async (c) => {
     const version = c.req.param("version");
     const platform = c.req.param("platform");
     const arch = c.req.param("arch");
     const { tag, filename } = await genReleaseUrl(version, platform, arch);
-    return c.redirect(`/gui/raw/download/${tag}/${filename}`);
+    const url = `https://github.com/fast-down/gui/releases/download/${tag}/${filename}`;
+    return c.redirect(url);
   });
 
 /**
