@@ -50,9 +50,14 @@ export const guiApp = new Hono()
  */
 async function genReleaseUrl(version: string, platform: string, arch: string) {
   if (version === "latest") version = await getLatestVersion();
+  const ext: Record<string, string> = {
+    windows: ".exe",
+    macos: ".dmg",
+    linux: "",
+  };
   return {
     tag: version,
-    filename: `fast-down-${platform}-${arch}${platform === "windows" ? ".exe" : ""}`,
+    filename: `fast-down-${platform}-${arch}${ext[platform]}`,
   };
 }
 
