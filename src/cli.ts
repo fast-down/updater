@@ -6,7 +6,7 @@ export const cliApp = new Hono()
     "/install/:platform",
     cache({
       cacheName: "installer",
-      cacheControl: "max-age=3600",
+      cacheControl: "max-age=604800",
     }),
     async (c) => {
       const platform = c.req.param("platform");
