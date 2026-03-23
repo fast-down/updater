@@ -68,7 +68,7 @@ async function fetchRelease(v: string = "latest") {
   const data = await resp.json();
   const tag = data["tag_name"];
   const assets = data["assets"].map((asset) => {
-    const [_name, platform, arch] = asset.name.split("-");
+    const [_name, platform, arch] = asset.name.split(".", 1)[0].split("-");
     const downloadUrl = asset["browser_download_url"];
     return {
       platform,
