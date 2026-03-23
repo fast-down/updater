@@ -3,7 +3,7 @@ import { cache } from "hono/cache";
 
 export const cliApp = new Hono()
   .get(
-    "/installer/:platform",
+    "/install/:platform",
     cache({
       cacheName: "installer",
       cacheControl: "max-age=3600",
