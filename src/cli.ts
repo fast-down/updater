@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import * as cheerio from "cheerio";
 import { cache } from "hono/cache";
 
 export const cliApp = new Hono()
