@@ -3,67 +3,48 @@ import * as cheerio from "cheerio";
 
 export const guiApp = new Hono()
   .get("/latest", async (c) => {
-    const version = await getLatestVersion();
-    const infoResp = await fetch(
-      `https://github.com/fast-down/gui/releases/expanded_assets/v${version}`,
-    );
-    const html = await infoResp.text();
-    const $ = cheerio.load(html, {
-      baseURI: infoResp.url,
-    });
-    const assets = $("ul>li")
-      .map((_, el) => {
-        const a = $(el).find("a");
-        return {
-          name: a.text().trim(),
-          url: a.prop("href")!,
-        };
-      })
-      .toArray()
-      .filter((item) => !item.name.includes("Source code"))
-      .map((item) => {
-        const parts = item.url.split("/").at(-1)!.split(".")[0].split("-");
-        return {
-          platform: parts[2],
-          arch: parts[3],
-        };
-      });
+    const { tag, assets } = await fetchRelease("latest");
     return c.json({
-      version,
-      assets,
+      version: tag,
+      assets: assets.map((asset) => ({
+        platform: asset.platform,
+        arch: asset.arch,
+        download_url: asset.downloadUrl,
+      })),
     });
   })
   .get("/download/:version/:platform/:arch", async (c) => {
     const version = c.req.param("version");
     const platform = c.req.param("platform");
     const arch = c.req.param("arch");
-    const { tag, filename } = await genReleaseUrl(version, platform, arch);
-    const url = `https://github.com/fast-down/gui/releases/download/v${tag}/${filename}`;
-    return c.redirect(url);
+    const { assets } = await fetchRelease(version);
+    const asset = assets.find(
+      (asset) => asset.platform == platform && asset.arch == arch,
+    );
+    if (!asset) c.notFound();
+    return c.redirect(asset.downloadUrl);
   });
 
-/**
- * 生成 gui release 下载地址
- * @param version 版本号，`latest` 表示最新版本，不需要带 `v`
- * @param platform 操作系统，`windows`、`linux`、`macos`
- * @param arch 架构，`64bit`、`32bit`、`arm64`
- */
-async function genReleaseUrl(version: string, platform: string, arch: string) {
-  if (version === "latest") version = await getLatestVersion();
-  const ext: Record<string, string> = {
-    windows: ".exe",
-    macos: ".dmg",
-    linux: "",
-  };
-  return {
-    tag: version,
-    filename: `fast-down-${platform}-${arch}${ext[platform]}`,
-  };
-}
-
-async function getLatestVersion() {
-  const releasesResp = await fetch(
-    "https://github.com/fast-down/gui/releases/latest/",
-  );
-  return releasesResp.url.split("/").at(-1)!.split("v")[1];
+async function fetchRelease(v: string = "latest") {
+  const url =
+    v === "latest"
+      ? "https://api.github.com/repos/fast-down/gui/releases/latest"
+      : `https://api.github.com/repos/fast-down/gui/releases/tags/${v}`;
+  const resp = await fetch(url, {
+    headers: {
+      "User-Agent": "fast-down-update",
+    },
+  });
+  const data = await resp.json();
+  const tag = data["tag_name"];
+  const assets = data["assets"].map((asset) => {
+    const [_name, platform, arch] = asset.name.split(".", 1)[0].split("-");
+    const downloadUrl = asset["browser_download_url"];
+    return {
+      platform,
+      arch,
+      downloadUrl,
+    };
+  });
+  return { tag, assets };
 }
