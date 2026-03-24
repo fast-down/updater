@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import * as cheerio from "cheerio";
 
 export const guiApp = new Hono()
   .get("/latest", async (c) => {
