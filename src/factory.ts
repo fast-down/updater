@@ -1,0 +1,68 @@
+import { Hono } from "hono";
+import * as cheerio from "cheerio";
+import { normalizeArch } from "./arch";
+
+export interface UpdaterConfig {
+  repo: string;
+  filenameGenerator: (platform: string, arch: string) => string;
+}
+
+export function createUpdaterApp(config: UpdaterConfig) {
+  const app = new Hono();
+
+  async function getLatestVersion() {
+    const resp = await fetch(
+      `https://github.com/${config.repo}/releases/latest/`,
+    );
+    const tag = resp.url.split("/").pop() || "";
+    return tag.replace(/^v/, "");
+  }
+
+  app.get("/latest", async (c) => {
+    const version = await getLatestVersion();
+    const infoResp = await fetch(
+      `https://github.com/${config.repo}/releases/expanded_assets/v${version}`,
+    );
+    const html = await infoResp.text();
+    const $ = cheerio.load(html, { baseURI: infoResp.url });
+    const assets = $("ul>li")
+      .map((_, el) => {
+        const a = $(el).find("a");
+        return {
+          name: a.text().trim(),
+          url: a.prop("href") || "",
+        };
+      })
+      .toArray()
+      .filter((item) => item.name && !item.name.includes("Source code"))
+      .map((item) => {
+        const match = item.name.match(
+          /-(windows|linux|macos)-([a-zA-Z0-9_]+)/i,
+        );
+        if (!match) return null;
+        return {
+          platform: match[1].toLowerCase(),
+          arch: match[2].toLowerCase(),
+        };
+      })
+      .filter((item) => item !== null);
+    return c.json({
+      version,
+      assets,
+    });
+  });
+
+  app.get("/download/:version/:platform/:arch", async (c) => {
+    let version = c.req.param("version");
+    const platform = c.req.param("platform");
+    const arch = normalizeArch(c.req.param("arch"));
+    if (version === "latest") {
+      version = await getLatestVersion();
+    }
+    const filename = config.filenameGenerator(platform, arch);
+    const url = `https://github.com/${config.repo}/releases/download/v${version}/${filename}`;
+    return c.redirect(url);
+  });
+
+  return app;
+}

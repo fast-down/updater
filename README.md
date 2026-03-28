@@ -10,19 +10,20 @@
 
 ### 获取最新版本
 
-[https://fast-down-update.s121.top/cli/latest](https://fast-down-update.s121.top/cli/latest)
+[https://fast-down-update.s121.top/gui/latest](https://fast-down-update.s121.top/gui/latest)
 
 ```json
 {
-  "version": "2.2.1",
+  "version": "0.1.44",
   "assets": [
-    { "platform": "linux", "arch": "64bit" },
-    { "platform": "linux", "arch": "arm64" },
-    { "platform": "macos", "arch": "64bit" },
-    { "platform": "macos", "arch": "arm64" },
-    { "platform": "windows", "arch": "32bit" },
-    { "platform": "windows", "arch": "64bit" },
-    { "platform": "windows", "arch": "arm64" }
+    { "platform": "linux", "arch": "aarch64" },
+    { "platform": "linux", "arch": "i686" },
+    { "platform": "linux", "arch": "x86_64" },
+    { "platform": "macos", "arch": "aarch64" },
+    { "platform": "macos", "arch": "x86_64" },
+    { "platform": "windows", "arch": "aarch64" },
+    { "platform": "windows", "arch": "i686" },
+    { "platform": "windows", "arch": "x86_64" }
   ]
 }
 ```
@@ -51,9 +52,9 @@
   - `macos`
   - `windows`
 - {架构}
-  - `32bit`
-  - `64bit`
-  - `arm64`
+  - `64bit` / `x86_64` / `x64` / `amd64`
+  - `32bit` / `x86` / `i686` / `i386`
+  - `arm64` / `aarch64`
 
 ## 开发
 
@@ -64,17 +65,4 @@ bun run dev
 
 ```txt
 bun run deploy
-```
-
-[For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
-
-```txt
-bun run cf-typegen
-```
-
-Pass the `CloudflareBindings` as generics when instantiation `Hono`:
-
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: CloudflareBindings }>()
 ```
