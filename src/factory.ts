@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import * as cheerio from "cheerio";
 import { normalizeArch } from "./arch";
+import { normalizePlatform } from "./platform";
 
 export interface UpdaterConfig {
   repo: string;
@@ -53,8 +54,8 @@ export function createUpdaterApp(config: UpdaterConfig) {
   });
 
   app.get("/download/:version/:platform/:arch", async (c) => {
-    let version = c.req.param("version");
-    const platform = c.req.param("platform");
+    let version = c.req.param("version").trim().toLowerCase().replace(/^v/, "");
+    const platform = normalizePlatform(c.req.param("platform"));
     const arch = normalizeArch(c.req.param("arch"));
     if (version === "latest") {
       version = await getLatestVersion();
