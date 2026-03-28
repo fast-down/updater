@@ -56,12 +56,15 @@ export function createUpdaterApp(config: UpdaterConfig) {
   app.get("/download/:version/:platform/:arch", async (c) => {
     let version = c.req.param("version").trim().toLowerCase().replace(/^v/, "");
     const platform = normalizePlatform(c.req.param("platform"));
+    if (platform === "unknown") return c.text("Unsupported platform", 404);
     const arch = normalizeArch(c.req.param("arch"));
-    if (version === "latest") {
-      version = await getLatestVersion();
-    }
+    if (arch === "unknown" || (platform === "macos" && arch === "x86"))
+      return c.text("Unsupported architecture", 404);
+    if (version === "latest") version = await getLatestVersion();
     const filename = config.filenameGenerator(platform, arch);
     const url = `https://github.com/${config.repo}/releases/download/v${version}/${filename}`;
+    const resp = await fetch(url, { redirect: "manual", method: "HEAD" });
+    if (resp.status !== 302) return c.notFound();
     return c.redirect(url);
   });
 

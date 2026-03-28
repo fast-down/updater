@@ -8,7 +8,7 @@ const generic32 = /32bit/i;
 
 export function normalizeArch(arch: string): string {
   if (arm64Pattern.test(arch)) return "aarch64";
-  if (arm32Pattern.test(arch)) return "arm";
+  if (arm32Pattern.test(arch)) return "unknown";
   if (x86_64Pattern.test(arch)) return "x86_64";
   if (x86Pattern.test(arch)) return "x86";
   if (generic64.test(arch)) return "x86_64";
