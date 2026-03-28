@@ -12,6 +12,7 @@ export function normalizeArch(arch: string): string {
       return "i686";
     case "arm64":
     case "aarch64":
+    case "armv8":
       return "aarch64";
     default:
       return "unknown";
