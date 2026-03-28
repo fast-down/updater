@@ -21,6 +21,9 @@ const guiApp = createUpdaterApp({
   },
 });
 
-const app = new Hono().route("/cli", cliApp).route("/gui", guiApp);
+const app = new Hono()
+  .basePath("/update")
+  .route("/cli", cliApp)
+  .route("/gui", guiApp);
 
 export default app;
