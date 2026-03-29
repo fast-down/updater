@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { createUpdaterApp } from "./factory";
+import { trimTrailingSlash } from "hono/trailing-slash";
 
 const cliApp = createUpdaterApp({
   repo: "fast-down/cli",
@@ -7,7 +8,21 @@ const cliApp = createUpdaterApp({
     const ext = platform === "windows" ? ".exe" : "";
     return `fd-${platform}-${arch}${ext}`;
   },
-});
+})
+  .get("/install.sh", async (c) => {
+    const res = await fetch(
+      "https://raw.githubusercontent.com/fast-down/cli/refs/heads/main/scripts/install.sh",
+    );
+    if (!res.ok) return c.text("Script not found", 404);
+    return new Response(res.body, res);
+  })
+  .get("/install.ps1", async (c) => {
+    const res = await fetch(
+      "https://raw.githubusercontent.com/fast-down/cli/refs/heads/main/scripts/install.ps1",
+    );
+    if (!res.ok) return c.text("Script not found", 404);
+    return new Response(res.body, res);
+  });
 
 const guiApp = createUpdaterApp({
   repo: "fast-down/gui",
@@ -22,6 +37,7 @@ const guiApp = createUpdaterApp({
 });
 
 const app = new Hono()
+  .use(trimTrailingSlash())
   .basePath("/update")
   .route("/cli", cliApp)
   .route("/gui", guiApp);
