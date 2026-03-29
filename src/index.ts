@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { createUpdaterApp } from "./factory";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { cache } from "hono/cache";
 
 const cliApp = createUpdaterApp({
   repo: "fast-down/cli",
@@ -38,11 +39,14 @@ const guiApp = createUpdaterApp({
 
 const app = new Hono()
   .use(trimTrailingSlash())
-  .use("*", async (c, next) => {
-    await next();
-    c.header("Cache-Control", "public, max-age=180");
-  })
   .basePath("/update")
+  .get(
+    "*",
+    cache({
+      cacheName: "fd-updater-cache",
+      cacheControl: "max-age=180",
+    }),
+  )
   .route("/cli", cliApp)
   .route("/gui", guiApp);
 
