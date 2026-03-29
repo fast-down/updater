@@ -38,6 +38,10 @@ const guiApp = createUpdaterApp({
 
 const app = new Hono()
   .use(trimTrailingSlash())
+  .use("*", async (c, next) => {
+    await next();
+    c.header("Cache-Control", "public, max-age=180");
+  })
   .basePath("/update")
   .route("/cli", cliApp)
   .route("/gui", guiApp);
